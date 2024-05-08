@@ -11,7 +11,8 @@ export const load = (async ({ url }) => {
 		{ port: 4222 },
 		{ servers: "localhost" },
 	];
-  let datas;
+  // const datas = {id:12345} ;
+  const datas: object[] = [];
 	
 	servers.forEach(async (v) => {
 		try {
@@ -23,13 +24,16 @@ export const load = (async ({ url }) => {
       // create a simple subscriber and iterate over messages
       // matching the subscription
 			const sub = nc.subscribe("*");
-			await (async () => {
+			
+      await (async () => {
 				for await (const m of sub) {
-					console.log(`[${sub.getProcessed()}]: ${sc.decode(m.data)}`);
-          // datas = datas.push(sc.decode(m.data));
+					// console.log(`[${sub.getProcessed()}]: ${sc.decode(m.data)}`);
+          datas.push(sc.decode(m.data));
 				}
 				console.log("subscription closed");
 			})();
+
+      console.log('eventually0..... ', datas.length);
 
 			// this promise indicates the client closed
 			const done = nc.closed();
@@ -46,6 +50,7 @@ export const load = (async ({ url }) => {
 			console.log(`error connecting to ${JSON.stringify(v)}`);
 		}
 	});
+
     return {
        // whatever we want to return
        data: datas
